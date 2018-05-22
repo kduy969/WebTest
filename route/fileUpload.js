@@ -6,50 +6,42 @@ var formidable = require('formidable');
 var router = express.Router();
 var multer = require('multer');
 var fs = require('fs');
-
-var uploading = multer({
-    dest: __dirname + '../public/uploads/',
-})
+var path = require('path');
 
 router.post('/', function (req, res) {
     var form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
-        var oldpath = files.filetoupload.path;
-        var newpath = __dirname+'/../public/' + files.filetoupload.name;
-        var fileName=  files.filetoupload.name;
+        if(files.filetoupload.size === 0){
+            res.sendfile("error.html")
+            //res.render("error");
+        }
+        else {
+            var oldpath = files.filetoupload.path;
+            var newpath = __dirname + '/../public/' + files.filetoupload.name;
+            var fileName = files.filetoupload.name;
 
-        fs.readFile(oldpath, function (err, data) {
-            if (err) throw err;
-            console.log('File read!');
-
-            // Write the file
-            fs.writeFile(newpath, data, function (err) {
+            fs.readFile(oldpath, function (err, data) {
                 if (err) throw err;
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                res.write('File path is <a href="' + fileName + '">here</a>');
-                res.end();
-                console.log('File written!');
-            });
+                console.log('File read!');
 
-            // Delete the file
-            fs.unlink(oldpath, function (err) {
-                if (err) throw err;
-                console.log('File deleted!');
-            });
-        });
+                // Write the file
+                fs.writeFile(newpath, data, function (err) {
+                    if (err) throw err;
+                    res.writeHead(200, {'Content-Type': 'text/html'});
+                    res.write('<span style="font-size:50px">File path is </span> <a style="font-size: 50px" href="' + fileName + '">here</a>');
+                    res.end();
+                    console.log('File written!');
+                });
 
-       /* fs.rename(oldpath, newpath, function (err) {
-            //if (err) throw err;
-            if(err){
-                res.send(err.toString());
-            }
-            else {
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                res.write('File path is:<a href="' + newpath + '">link text</a>');
-                res.end();
-            }
-        });*/
+                // Delete the file
+                fs.unlink(oldpath, function (err) {
+                    if (err) throw err;
+                    console.log('File deleted!');
+                });
+            });
+        }
     });
+
 })
 
 module.exports = router;
