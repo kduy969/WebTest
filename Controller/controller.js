@@ -2,10 +2,15 @@
  * Created by kduyi on 21-May-18.
  */
 var path = require('path');
+var bodyParser = require('body-parser')
 
 module.exports = function (app){
+    app.use(bodyParser.text());
+    app.use(bodyParser.json());
     app.use('/',require('../route/root'));
     app.use('/fileupload',require('../route/fileUpload'));
+    app.use('/test',require('../route/test'));
+
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {

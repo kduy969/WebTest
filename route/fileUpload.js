@@ -12,7 +12,7 @@ router.post('/', function (req, res) {
     var form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
         if(files.filetoupload.size === 0){
-            res.sendfile("error.html")
+            res.sendFile('errorUpload.html', { root: path.join(__dirname, '../public') });
             //res.render("error");
         }
         else {
@@ -27,8 +27,12 @@ router.post('/', function (req, res) {
                 // Write the file
                 fs.writeFile(newpath, data, function (err) {
                     if (err) throw err;
+
+                    let address =req.connection.remoteAddress;
+                    let port= req.connection.remotePort;
+                    let href = req.protocol+"://"+req.headers.host+"/"+fileName;
                     res.writeHead(200, {'Content-Type': 'text/html'});
-                    res.write('<span style="font-size:50px">File path is </span> <a style="font-size: 50px" href="' + fileName + '">here</a>');
+                    res.write('<span style="font-size:50px">File path is </span> <a style="font-size: 50px" href="' + href + '">here</a>');
                     res.end();
                     console.log('File written!');
                 });
